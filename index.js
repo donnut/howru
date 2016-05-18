@@ -1,14 +1,36 @@
 const http = require('http');
 
-module.exports = function(options) {
+module.exports = (function() {
 
-  if (options.type == 'http') {
-    const server = http.createServer((req, res) => {
-      res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end();
-    });
-
-    server.listen(options.port || 6999);
+  function Howru(options) {
+    this.options = options;
+    this.status = 200;
   }
 
-}
+  Howru.prototype.status = function() {
+    return this.status;
+  }
+
+  Howru.prototype.stop = function() {
+    this.server.close();
+  }
+
+  Howru.prototype.died = function() {
+    this.status = 500;
+  }
+
+  Howru.prototype.start = function() {
+
+    if (this.options.type == 'http') {
+      this.server = http.createServer((req, res) => {
+        res.writeHead(this.status, {'Content-Type': 'text/plain'});
+        res.end();
+      });
+
+      this.server.listen(this.options.port || 6999);
+    }
+  }
+
+  return Howru;
+
+}());
