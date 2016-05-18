@@ -1,0 +1,25 @@
+{
+  "name": "howru",
+  "version": "0.0.1",
+  "description": "Health check utility for microservices",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/donnut/howru.git"
+  },
+  "keywords": [
+    "health",
+    "checking",
+    "microservice",
+    "monitor"
+  ],
+  "author": "Erwin Poeze",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/donnut/howru/issues"
+  },
+  "homepage": "https://github.com/donnut/howru#readme"
+}
