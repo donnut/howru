@@ -12,26 +12,29 @@ npm install howru --save
 
 ## Usage
 ```javascript
-var howru = require('howru');
+var Howru = require('howru');
 
 // http protocol
-var health = howru({
+var health = new Howru({
   type: 'http',
   route: '/health'
 });
+health.start();
 
 // tcp protocol
-var health = howru({
+var health = new Howru({
   type: 'tcp',
-  port: '6901'
+  port: '6999'
 });
+health.start();
 
 // ttl
-var health = howru({
+var health = new Howru({
   type: 'ttl',
   url: 'consul://',
   interval: 30
 });
+health.start();
 ```
 
 ## Status

@@ -1,4 +1,5 @@
 const assert = require('assert');
+const async = require('async');
 const Howru = require('..');
 
 describe('Connections', function() {
@@ -45,6 +46,36 @@ describe('Connections', function() {
       });
 
       req.write(' ');
+    });
+  });
+});
+
+describe('Multiple checks', function() {
+
+  describe('HTTP', function() {
+
+    it('5 good healths in a row', function(done) {
+      const http = require('http');
+
+      const health = new Howru({
+        type: 'http',
+        route: '/health',
+        port: 6999
+      });
+
+      health.start();
+
+      async.times(5, function(n, next) {
+        var req = http.request({path: '/health', port: 6999, method: 'POST'}, (res) => {
+          next(null, res.statusCode)
+        });
+        req.write(' ');
+      }, function(err, result) {
+        assert.equal(result.length, 5);
+        assert.deepEqual(result, [200,200,200,200,200]);
+        done();
+      });
+
     });
   });
 });
