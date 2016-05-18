@@ -6,6 +6,23 @@ describe('Connections', function() {
 
   describe('HTTP', function() {
 
+    it('reject premature connection', function(done) {
+
+      const http = require('http');
+
+      const health = new Howru({
+        type: 'http',
+        route: '/health'
+      });
+
+      var req = http.request({path: '/health', port: 6999, method: 'POST'}, (res) => {});
+      req.on('error', (err) => {
+        assert.equal(err.code, 'ECONNREFUSED');
+        done();
+      });
+
+    });
+
     it('responds with 200', function(done) {
 
       const http = require('http');
