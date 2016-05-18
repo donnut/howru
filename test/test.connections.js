@@ -1,5 +1,7 @@
 const assert = require('assert');
 const async = require('async');
+const http = require('http');
+const net = require('net');
 const Howru = require('..');
 
 describe('Connections', function() {
@@ -7,8 +9,6 @@ describe('Connections', function() {
   describe('HTTP', function() {
 
     it('reject premature connection', function(done) {
-
-      const http = require('http');
 
       const health = new Howru({
         type: 'http',
@@ -23,9 +23,23 @@ describe('Connections', function() {
 
     });
 
-    it('responds with 200', function(done) {
+    xit('ignore unknown url route', function(done) {
 
-      const http = require('http');
+      const health = new Howru({
+        type: 'http',
+        route: '/health'
+      });
+
+      health.start();
+
+      var req = http.request({path: '/fail', port: 6999, method: 'POST'}, (res) => {
+        health.stop();
+        done();
+      });
+
+    });
+
+    it('responds with 200', function(done) {
 
       const health = new Howru({
         type: 'http',
@@ -46,8 +60,6 @@ describe('Connections', function() {
 
     it('responds with 500', function(done) {
 
-      const http = require('http');
-
       const health = new Howru({
         type: 'http',
         route: '/health'
@@ -64,6 +76,31 @@ describe('Connections', function() {
 
       req.write(' ');
     });
+  });
+
+  describe('tcp', function() {
+
+    it('responds with 200', function(done) {
+      const net = require('net');
+
+      const health = new Howru({
+        type: 'tcp',
+        port: 6999
+      });
+
+      health.start();
+
+      const client = net.createConnection({port: 6999}, () => {
+        client.write('oke?');
+      });
+
+      client.on('data', (data) => {
+        assert.equal(parseInt(data, 10), 200);
+        health.stop();
+        done();
+      });
+    });
+
   });
 });
 
