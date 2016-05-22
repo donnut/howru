@@ -101,6 +101,28 @@ describe('Connections', function() {
       });
     });
 
+    it('responds with 500', function(done) {
+      const net = require('net');
+
+      const health = new Howru({
+        type: 'tcp',
+        port: 6999
+      });
+
+      health.start();
+      health.died();
+
+      const client = net.createConnection({port: 6999}, () => {
+        client.write('oke?');
+      });
+
+      client.on('data', (data) => {
+        assert.equal(parseInt(data, 10), 500);
+        health.stop();
+        done();
+      });
+    });
+
   });
 });
 
@@ -109,7 +131,6 @@ describe('Multiple checks', function() {
   describe('HTTP', function() {
 
     it('5 good healths in a row', function(done) {
-      const http = require('http');
 
       const health = new Howru({
         type: 'http',
@@ -127,8 +148,42 @@ describe('Multiple checks', function() {
       }, function(err, result) {
         assert.equal(result.length, 5);
         assert.deepEqual(result, [200,200,200,200,200]);
+        health.stop();
         done();
       });
+
+    });
+  });
+
+  describe('TCP', function() {
+
+    it('5 good healths in a row', function(done) {
+
+      const health = new Howru({
+        type: 'tcp',
+        port: 6999
+      });
+      let counter = 0;
+
+      health.start();
+
+      const client = net.connect({port: 6999}, () => {
+        async.timesSeries(5, (n, next) => {
+          client.write('ke?');
+          setTimeout(next, 1);
+        })
+      });
+
+      client.on('data', (data) => {
+        counter++;
+        if (counter == 5) {
+          assert.ok(true);
+          health.stop();
+          done();
+        }
+      });
+
+      client.on('end', () => console.log('ended'));
 
     });
   });

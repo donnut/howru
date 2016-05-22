@@ -20,7 +20,11 @@ module.exports = (function() {
   }
 
   Howru.prototype.stop = function() {
-    this.server.close();
+    if (this.type == 'http') {
+      this.server.close();
+    } else if (this.type == 'tcp') {
+      this.server.close();
+    }
   }
 
   Howru.prototype.died = function() {
@@ -38,9 +42,12 @@ module.exports = (function() {
       });
 
     } else if (this.type == 'tcp') {
-      this.server = net.createServer((conn) => {
-        conn.write(String(this.status));
-        conn.on('end', () => {})
+      this.server = net.createServer()
+      this.server.on('connection', (sock) => {
+        sock.on('end', () => {});
+        sock.on('data', (data) => {
+          sock.write(String(this.status));
+        })
       });
     } else {
       throw new Error('not implemented yet');
@@ -48,7 +55,6 @@ module.exports = (function() {
     }
 
     this.server.listen(this.port);
-
 
   }
 
