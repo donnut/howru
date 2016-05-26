@@ -62,17 +62,14 @@ module.exports = (function() {
                 host: this.url,
                 port: this.port,
                 method: 'PUT',
-                path: this.path,
-                headers: {
-                    'Content-Type': 'application/x-text'
-                }
+                path: this.path
             });
 
             req.write('OK');
             setInterval(() => {
                 req.write(String(this.status));
             }, this.interval);
-            req.on('error', (e) => { 
+            req.on('error', (e) => {
                 req.end();
                 console.log(`problem with request: ${e.message}`);
             });

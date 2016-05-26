@@ -135,14 +135,15 @@ describe('Connections', function() {
             const server = http.createServer(function(req, res) {
                 res.end();
             });
+
             server.on('request', function(req, res) {
-                console.log('receiving');
                 assert.ok(Date.now() - startTime < ttl);
                 health.stop();
                 server.close();
                 done();
             });
-            server.listen(7000, 'localhost')
+
+            server.listen(7000)
 
                 const health = new Howru({
                     type: 'ttl',
@@ -200,7 +201,7 @@ describe('Multiple checks', function() {
             const client = net.connect({port: 6999}, () => {
                 async.timesSeries(5, (n, next) => {
                     client.write('oke?');
-                    setTimeout(next, 1);
+                    setTimeout(next, 10);
                 })
             });
 
@@ -234,9 +235,7 @@ describe('Multiple checks', function() {
             health.start();
             let counter = 0;
 
-            const server = http.createServer(function(req, res) {
-                //res.end();
-            });
+            const server = http.createServer();
 
             server.on('request', function(req, res) {
                 req.on('data', (chunk) => {
